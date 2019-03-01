@@ -4,3 +4,65 @@
 - **지역변수의 범위를 줄이는 가장 강력한 기법은 '가장 처음 쓰일 때 선언하기'다**
     - 사용하려면 멀었는데 미리 선언해두면 가독성이 떨어짐
 - **거의 모든 지역변수는 선언과 동시에 초기화해야 한다**    
+    - try-catch문은 예외다. 변수를 초기화하는 표현식에서 검사 예외를 던질 가능성이 남아있다면 try블록 안에서 초기화 해야한다.
+    (그렇지 않으면 예외가 블록을 넘어 메서드에까지 전파된다)
+    - 변수 값을 try 블록 바깥에서도 사용해야 한다면 try 블록 앞에서 선언해야 한다.
+    
+- 반복문은 변수 범위를 최소화 해준다.
+    - 반복문에서는 반복 변수(loop variable)의 범위가 반복문의 몸체, for 키워드와 몸체 사이의 괄호 안으로 제한된다.
+    - 반복 변수의 값을 반복문 종류 이후에도 사용하는 상황이 아니라면 for문이 while문을 쓰는 것 보다 낫다
+    - 코드 57-1 컬렉션이나 배열을 순회하는 권장 관용구
+        ```java
+        for (Element e : c) {
+          ... // e로 무언가를 한다.
+        }
+        ```
+    - 코드 57-2 반복자가 필요할 때의 관용구
+        ```java
+        for (Iterator<Element> i = c.iterator(); i.hasNext(); ) {
+          Element e = i.next();
+          ... // e와 i로 무언가를 한다
+        }
+        ```    
+    
+    - while문의 버그
+        ```java
+        Iterator<Element> i = c.iterator();
+        while (i.hasNext()) {
+            doSomething(i.next());
+        }
+  
+        ...
+  
+        Iterator<Element> i2 = c.iterator();
+        while (i.hasNext()) {
+            doSomething(i2.next()); // 버그      
+        }
+        ```
+    - 실수로 아래에서 i를 사용했는데 i의 유효범위가 끝나지 않아 컴파일도 잘되고 실행시 예외를 던지지 않음
+    - for 문을 사용하면 오류를 컴파일 타임에 잡을 수 있음.
+        ```java
+        for (Iterator<Element> i = c.iterator(); i.hasNext(); ) {     
+        Element e = i.next();
+        ... // e와 i로 무언가를 한다.
+        }
+        ...
+  
+        // 다음 코드는 "i를 찾을 수 없다"는 컴파일 오류를 낸다.
+        for (Iterator<Element> i2 = c2.iterator(); i.hasNext(); ) {
+        Element e2 = i2.next();
+        ... // e2와 i2로 무언가를 한다.
+        }
+        ``` 
+    - for문이 복사해 붙여넣기 오류를 줄여주는 이유
+        - 변수 유횸 범위가 for 문 범위와 일치하여 똑같은 이름의 변수를 여러 반복문에서 써도 서로 아무런 영향을 주지 않음
+    - for문은 while 문보다 짧아서 가독성이 좋음
+    - 지역 변수의 범위를 최소하하는 또 다른 반복문 관용구
+        ```java
+        for(int i = 0, n = expensiveComputation(); i < n; i++){
+          ... // i로 무언가를 한다.
+        }
+        ```
+        
+- 지역변수 범위를 최호화하는 마지막 방법은 **메서드를 작게 유지하고 한 가지 기능에 집중하는 것이다**
+    - 단순힌 메서드를 기능별로 쪼개면 된다.        
